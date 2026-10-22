@@ -16,6 +16,8 @@ const defaultSettings: SubscriptionSettings = {
   timeoutSeconds: 300,
   codexPath: 'codex',
   geminiPath: 'gemini',
+  claudePath: 'claude',
+  opencodePath: 'opencode',
   routingMode: 'auto',
   manualModel: 'GPT-6.1 Sol Medium',
 };

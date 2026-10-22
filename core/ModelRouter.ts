@@ -2,7 +2,7 @@ import { TaskAssessment, ProviderStatus } from '../src/types';
 import { SubscriptionManager } from './SubscriptionManager';
 
 export interface RouteDecision {
-  provider: 'codex' | 'gemini';
+  provider: 'codex' | 'gemini' | 'claude' | 'opencode';
   model: string;
   reasoningEffort?: string;
   explanation: string;
@@ -21,8 +21,53 @@ export class ModelRouter {
     // 0. Provider availability check
     const isCodexInstalled = availableProviders.some((p) => p.id === 'codex' && p.installed);
     const isGeminiInstalled = availableProviders.some((p) => p.id === 'gemini' && p.installed);
+    const isClaudeInstalled = availableProviders.some((p) => p.id === 'claude' && p.installed);
+    const isOpencodeInstalled = availableProviders.some((p) => p.id === 'opencode' && p.installed);
 
-    if (!isCodexInstalled && isGeminiInstalled && !manualModel) {
+    // 1. Manual Override check
+    if (settings.routingMode === 'manual' || manualModel) {
+      const selectedModel = manualModel || settings.manualModel || 'GPT-6.1 Sol Medium';
+      let provider: 'codex' | 'gemini' | 'claude' | 'opencode' = 'codex';
+      if (selectedModel.toLowerCase().includes('claude')) {
+        provider = 'claude';
+      } else if (
+        selectedModel.toLowerCase().includes('opencode') ||
+        selectedModel.includes('Qwen') ||
+        selectedModel.includes('DeepSeek') ||
+        selectedModel.includes('Llama')
+      ) {
+        provider = 'opencode';
+      } else if (selectedModel.toLowerCase().includes('gemini')) {
+        provider = 'gemini';
+      }
+
+      return {
+        provider,
+        model: selectedModel,
+        reasoningEffort:
+          selectedModel.includes('High') || selectedModel.includes('Ultra') ? 'high' : 'medium',
+        explanation: `Manual selection mode active. Directed to ${selectedModel}.`,
+      };
+    }
+
+    // Single provider availability fallbacks
+    if (!isCodexInstalled && !isGeminiInstalled && isClaudeInstalled) {
+      return {
+        provider: 'claude',
+        model: 'Claude 3.7 Sonnet',
+        explanation: 'Only Claude CLI is detected. Routing to Claude 3.7 Sonnet.',
+      };
+    }
+
+    if (!isCodexInstalled && !isGeminiInstalled && isOpencodeInstalled) {
+      return {
+        provider: 'opencode',
+        model: 'Qwen-2.5-Coder-32B',
+        explanation: 'Only OpenCode CLI is detected. Routing to local Qwen-2.5-Coder-32B.',
+      };
+    }
+
+    if (!isCodexInstalled && isGeminiInstalled) {
       return {
         provider: 'gemini',
         model: 'Gemini 3.8 High',
@@ -30,24 +75,12 @@ export class ModelRouter {
       };
     }
 
-    if (!isGeminiInstalled && isCodexInstalled && !manualModel) {
+    if (!isGeminiInstalled && isCodexInstalled) {
       return {
         provider: 'codex',
         model: assessment.complexity < 35 ? 'GPT-6 Luna' : 'GPT-6.1 Sol Medium',
         reasoningEffort: assessment.complexity < 35 ? 'low' : 'medium',
         explanation: 'Gemini CLI is not detected in PATH. Routing to available Codex CLI.',
-      };
-    }
-
-    // 1. Manual Override check
-    if (settings.routingMode === 'manual' || manualModel) {
-      const selectedModel = manualModel || settings.manualModel || 'GPT-6.1 Sol Medium';
-      const provider = selectedModel.toLowerCase().includes('gemini') ? 'gemini' : 'codex';
-      return {
-        provider,
-        model: selectedModel,
-        reasoningEffort: selectedModel.includes('High') || selectedModel.includes('Ultra') ? 'high' : 'medium',
-        explanation: `Manual selection mode active. Directed to ${selectedModel}.`,
       };
     }
 

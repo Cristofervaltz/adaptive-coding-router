@@ -231,6 +231,38 @@ export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved }) => {
                 Standard binary name in PATH or full absolute path to the executable.
               </span>
             </div>
+
+            <div>
+              <label className="block font-medium text-zinc-300 mb-1">
+                Anthropic Claude CLI Binary or Command
+              </label>
+              <input
+                type="text"
+                value={settings.claudePath}
+                onChange={(e) => setSettings({ ...settings, claudePath: e.target.value })}
+                placeholder="claude or C:\path\to\claude.cmd"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-zinc-700"
+              />
+              <span className="text-[11px] text-zinc-500 mt-0.5 block">
+                Standard binary name in PATH or full absolute path to the executable.
+              </span>
+            </div>
+
+            <div>
+              <label className="block font-medium text-zinc-300 mb-1">
+                OpenCode CLI Binary or Command
+              </label>
+              <input
+                type="text"
+                value={settings.opencodePath}
+                onChange={(e) => setSettings({ ...settings, opencodePath: e.target.value })}
+                placeholder="opencode or C:\path\to\opencode.exe"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-zinc-700"
+              />
+              <span className="text-[11px] text-zinc-500 mt-0.5 block">
+                Standard binary name in PATH or full absolute path to the executable.
+              </span>
+            </div>
           </div>
         </div>
 
@@ -314,6 +346,10 @@ export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved }) => {
                 <option value="GPT-6.1 Sol Ultra">GPT-6.1 Sol Ultra (Mission Critical)</option>
                 <option value="Astra High">Astra High (Assets & Spatial)</option>
                 <option value="Gemini 3.8 High">Gemini 3.8 High (Google)</option>
+                <option value="Claude 3.7 Sonnet">Claude 3.7 Sonnet (Anthropic)</option>
+                <option value="Claude 3.5 Sonnet">Claude 3.5 Sonnet (Anthropic)</option>
+                <option value="Qwen-2.5-Coder-32B">Qwen-2.5-Coder-32B (OpenCode)</option>
+                <option value="DeepSeek-Coder-V2">DeepSeek-Coder-V2 (OpenCode)</option>
               </select>
             </div>
           </div>

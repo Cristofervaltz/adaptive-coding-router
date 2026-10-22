@@ -11,6 +11,8 @@ export class SubscriptionManager {
     timeoutSeconds: 300,
     codexPath: 'codex',
     geminiPath: 'gemini',
+    claudePath: 'claude',
+    opencodePath: 'opencode',
     routingMode: 'auto',
     manualModel: 'GPT-6.1 Sol Medium',
   };
@@ -31,8 +33,15 @@ export class SubscriptionManager {
     return updated;
   }
 
-  public getModelGroup(model: string): 'google' | 'openai' {
-    if (model.toLowerCase().includes('gemini')) {
+  public getModelGroup(model: string): 'google' | 'openai' | 'anthropic' | 'opencode' {
+    const lower = model.toLowerCase();
+    if (lower.includes('claude')) {
+      return 'anthropic';
+    }
+    if (lower.includes('opencode') || lower.includes('qwen') || lower.includes('deepseek') || lower.includes('llama')) {
+      return 'opencode';
+    }
+    if (lower.includes('gemini')) {
       return 'google';
     }
     return 'openai';

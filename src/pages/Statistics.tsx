@@ -46,10 +46,14 @@ export const Statistics: React.FC = () => {
     );
   }
 
-  const totalProviderRuns = (stats.providerUsage.google || 0) + (stats.providerUsage.openai || 0);
-  const googlePct =
-    totalProviderRuns > 0 ? Math.round((stats.providerUsage.google / totalProviderRuns) * 100) : 0;
-  const openaiPct = totalProviderRuns > 0 ? 100 - googlePct : 0;
+  const totalProviderRuns =
+    (stats.providerUsage.google || 0) +
+    (stats.providerUsage.openai || 0) +
+    (stats.providerUsage.anthropic || 0) +
+    (stats.providerUsage.opencode || 0);
+
+  const getPct = (count: number) =>
+    totalProviderRuns > 0 ? Math.round((count / totalProviderRuns) * 100) : 0;
 
   return (
     <div className="flex-1 flex flex-col h-full bg-zinc-950 overflow-y-auto p-6 space-y-6">
@@ -148,26 +152,52 @@ export const Statistics: React.FC = () => {
           <div className="space-y-2">
             <div>
               <div className="flex justify-between text-xs font-mono text-zinc-400 mb-1">
-                <span>Google Gemini ({stats.providerUsage.google} runs)</span>
-                <span>{googlePct}%</span>
+                <span>Google Gemini ({stats.providerUsage.google || 0} runs)</span>
+                <span>{getPct(stats.providerUsage.google || 0)}%</span>
               </div>
               <div className="w-full bg-zinc-950 h-2 rounded-full overflow-hidden border border-zinc-800">
                 <div
                   className="bg-emerald-500 h-full rounded-full transition-all duration-300"
-                  style={{ width: `${googlePct}%` }}
+                  style={{ width: `${getPct(stats.providerUsage.google || 0)}%` }}
                 />
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-mono text-zinc-400 mb-1">
-                <span>OpenAI Codex ({stats.providerUsage.openai} runs)</span>
-                <span>{openaiPct}%</span>
+                <span>OpenAI Codex ({stats.providerUsage.openai || 0} runs)</span>
+                <span>{getPct(stats.providerUsage.openai || 0)}%</span>
               </div>
               <div className="w-full bg-zinc-950 h-2 rounded-full overflow-hidden border border-zinc-800">
                 <div
                   className="bg-blue-500 h-full rounded-full transition-all duration-300"
-                  style={{ width: `${openaiPct}%` }}
+                  style={{ width: `${getPct(stats.providerUsage.openai || 0)}%` }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between text-xs font-mono text-zinc-400 mb-1">
+                <span>Anthropic Claude ({stats.providerUsage.anthropic || 0} runs)</span>
+                <span>{getPct(stats.providerUsage.anthropic || 0)}%</span>
+              </div>
+              <div className="w-full bg-zinc-950 h-2 rounded-full overflow-hidden border border-zinc-800">
+                <div
+                  className="bg-amber-500 h-full rounded-full transition-all duration-300"
+                  style={{ width: `${getPct(stats.providerUsage.anthropic || 0)}%` }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between text-xs font-mono text-zinc-400 mb-1">
+                <span>OpenCode CLI ({stats.providerUsage.opencode || 0} runs)</span>
+                <span>{getPct(stats.providerUsage.opencode || 0)}%</span>
+              </div>
+              <div className="w-full bg-zinc-950 h-2 rounded-full overflow-hidden border border-zinc-800">
+                <div
+                  className="bg-purple-500 h-full rounded-full transition-all duration-300"
+                  style={{ width: `${getPct(stats.providerUsage.opencode || 0)}%` }}
                 />
               </div>
             </div>

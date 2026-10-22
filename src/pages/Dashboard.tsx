@@ -110,7 +110,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <option value="GPT-6.1 Sol High" className="bg-zinc-900">GPT-6.1 Sol High (Deep Reasoning)</option>
                     <option value="GPT-6.1 Sol Ultra" className="bg-zinc-900">GPT-6.1 Sol Ultra (Mission Critical)</option>
                     <option value="Astra High" className="bg-zinc-900">Astra High (Assets & Spatial)</option>
-                    <option value="Gemini 3.8 High" className="bg-zinc-900">Gemini 3.8 High (Google Subscription)</option>
+                    <option value="Gemini 3.8 High" className="bg-zinc-900">Gemini 3.8 High (Google)</option>
+                    <option value="Claude 3.7 Sonnet" className="bg-zinc-900">Claude 3.7 Sonnet (Anthropic)</option>
+                    <option value="Claude 3.5 Sonnet" className="bg-zinc-900">Claude 3.5 Sonnet (Anthropic)</option>
+                    <option value="Qwen-2.5-Coder-32B" className="bg-zinc-900">Qwen-2.5-Coder-32B (OpenCode)</option>
+                    <option value="DeepSeek-Coder-V2" className="bg-zinc-900">DeepSeek-Coder-V2 (OpenCode)</option>
                   </select>
                 </div>
               )}

@@ -3,7 +3,7 @@ import { ValidationResult, SubscriptionSettings, TaskCategory } from '../src/typ
 export interface EscalationDecision {
   canEscalate: boolean;
   nextModel?: string;
-  nextProvider?: 'codex' | 'gemini';
+  nextProvider?: 'codex' | 'gemini' | 'claude' | 'opencode';
   reasoningEffort?: string;
   reason: string;
   diagnosticContext: string;

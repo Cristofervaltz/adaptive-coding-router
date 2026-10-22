@@ -61,7 +61,7 @@ export interface Task {
 export interface Run {
   id: string;
   taskId: string;
-  provider: 'codex' | 'gemini' | 'mock';
+  provider: 'codex' | 'gemini' | 'claude' | 'opencode' | 'mock';
   model: string;
   reasoningEffort?: string;
   status: 'running' | 'completed' | 'failed' | 'cancelled';
@@ -103,7 +103,7 @@ export interface ProviderCapabilities {
 }
 
 export interface ProviderStatus {
-  id: 'codex' | 'gemini';
+  id: 'codex' | 'gemini' | 'claude' | 'opencode';
   name: string;
   installed: boolean;
   version?: string;
@@ -122,6 +122,8 @@ export interface SubscriptionSettings {
   timeoutSeconds: number;
   codexPath: string;
   geminiPath: string;
+  claudePath: string;
+  opencodePath: string;
   routingMode: 'auto' | 'manual';
   manualModel: string;
 }
@@ -136,6 +138,8 @@ export interface StatisticsOverview {
   providerUsage: {
     google: number;
     openai: number;
+    anthropic: number;
+    opencode: number;
   };
   ultraUsage: number;
   categorySuccess: Record<string, { total: number; passed: number }>;

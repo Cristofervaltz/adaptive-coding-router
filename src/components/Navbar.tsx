@@ -115,7 +115,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               title={`${p.name}: ${isOnline ? (p.authenticated ? 'Online & Authenticated' : 'Installed (Not Authenticated)') : 'Not Detected in PATH'}`}
             >
               <Cpu className="w-3 h-3" />
-              <span>{p.id === 'codex' ? 'Codex' : 'Gemini'}</span>
+              <span>
+                {p.id === 'codex'
+                  ? 'Codex'
+                  : p.id === 'gemini'
+                  ? 'Gemini'
+                  : p.id === 'claude'
+                  ? 'Claude'
+                  : 'OpenCode'}
+              </span>
               <span
                 className={`w-1.5 h-1.5 rounded-full ${
                   isOnline ? (p.authenticated ? 'bg-emerald-400' : 'bg-amber-400') : 'bg-zinc-600'

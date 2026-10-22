@@ -17,7 +17,7 @@ export class StatisticsService {
         escalationRate: 0,
         medianDurationSec: 0,
         attemptsPerTask: 0,
-        providerUsage: { google: 0, openai: 0 },
+        providerUsage: { google: 0, openai: 0, anthropic: 0, opencode: 0 },
         ultraUsage: 0,
         categorySuccess: {},
       };
@@ -40,6 +40,8 @@ export class StatisticsService {
     const categorySuccess: Record<string, { total: number; passed: number }> = {};
     let googleCount = 0;
     let openaiCount = 0;
+    let anthropicCount = 0;
+    let opencodeCount = 0;
     let ultraCount = 0;
 
     for (const task of tasks) {
@@ -73,6 +75,8 @@ export class StatisticsService {
 
       for (const run of taskRuns) {
         if (run.provider === 'gemini') googleCount += 1;
+        else if (run.provider === 'claude') anthropicCount += 1;
+        else if (run.provider === 'opencode') opencodeCount += 1;
         else openaiCount += 1;
 
         if (run.model && run.model.includes('Ultra')) {
@@ -100,6 +104,8 @@ export class StatisticsService {
       providerUsage: {
         google: googleCount,
         openai: openaiCount,
+        anthropic: anthropicCount,
+        opencode: opencodeCount,
       },
       ultraUsage: ultraCount,
       categorySuccess,
