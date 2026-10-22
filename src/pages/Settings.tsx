@@ -22,6 +22,10 @@ export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved }) => {
 
   useEffect(() => {
     const fetchSettings = async () => {
+      if (!window.acrApi) {
+        setLoading(false);
+        return;
+      }
       try {
         setLoading(true);
         const data = await window.acrApi.getSettings();

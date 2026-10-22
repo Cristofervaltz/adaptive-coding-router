@@ -7,6 +7,19 @@ import { Statistics } from './pages/Statistics';
 import { Settings } from './pages/Settings';
 import { RefreshCw } from 'lucide-react';
 
+const defaultSettings: SubscriptionSettings = {
+  reserveOpenAI: true,
+  openAIBudget: 100,
+  openAIUsed: 0,
+  allowUltra: true,
+  maxAttempts: 3,
+  timeoutSeconds: 300,
+  codexPath: 'codex',
+  geminiPath: 'gemini',
+  routingMode: 'auto',
+  manualModel: 'GPT-6.1 Sol Medium',
+};
+
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<'dashboard' | 'stats' | 'settings'>('dashboard');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -14,10 +27,11 @@ export const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [events, setEvents] = useState<RunEvent[]>([]);
   const [providers, setProviders] = useState<ProviderStatus[]>([]);
-  const [settings, setSettings] = useState<SubscriptionSettings | null>(null);
+  const [settings, setSettings] = useState<SubscriptionSettings>(defaultSettings);
   const [loading, setLoading] = useState(true);
 
   const loadTasks = useCallback(async (projectId: string) => {
+    if (!window.acrApi) return;
     try {
       const taskList = await window.acrApi.listTasks(projectId);
       setTasks(taskList);
@@ -27,16 +41,22 @@ export const App: React.FC = () => {
   }, []);
 
   const loadInitialData = useCallback(async () => {
+    if (!window.acrApi) {
+      console.warn('ACR bridge not available');
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const [fetchedSettings, fetchedProviders, recentProjects] = await Promise.all([
-        window.acrApi.getSettings(),
-        window.acrApi.detectProviders(),
-        window.acrApi.getRecentProjects(),
+        window.acrApi.getSettings().catch(() => defaultSettings),
+        window.acrApi.detectProviders().catch(() => []),
+        window.acrApi.getRecentProjects().catch(() => []),
       ]);
 
-      setSettings(fetchedSettings);
-      setProviders(fetchedProviders);
+      if (fetchedSettings) setSettings(fetchedSettings);
+      if (fetchedProviders) setProviders(fetchedProviders);
 
       if (recentProjects && recentProjects.length > 0) {
         const activeProj = recentProjects[0];
@@ -52,6 +72,8 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     loadInitialData();
+
+    if (!window.acrApi) return;
 
     // Listen for live CLI and validation events
     const unsubEvent = window.acrApi.onTaskEvent((event: RunEvent) => {
@@ -146,7 +168,7 @@ export const App: React.FC = () => {
             onSelectTask={(id) => setSelectedTaskId(id)}
             onCreateTask={handleCreateTask}
             events={events}
-            settings={settings!}
+            settings={settings}
           />
         ) : currentTab === 'stats' ? (
           <Statistics />

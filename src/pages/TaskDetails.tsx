@@ -37,6 +37,10 @@ export const TaskDetails: React.FC<TaskDetailsProps> = ({ taskId, onBack }) => {
   const [ratingSubmitted, setRatingSubmitted] = useState<boolean>(false);
 
   const fetchDetails = useCallback(async () => {
+    if (!window.acrApi) {
+      setLoading(false);
+      return;
+    }
     try {
       const details = await window.acrApi.getTaskDetails(taskId);
       if (details) {
@@ -57,6 +61,8 @@ export const TaskDetails: React.FC<TaskDetailsProps> = ({ taskId, onBack }) => {
 
   useEffect(() => {
     fetchDetails();
+
+    if (!window.acrApi) return;
 
     const unsubStatus = window.acrApi.onTaskStatusChanged((data) => {
       if (data.taskId === taskId) {

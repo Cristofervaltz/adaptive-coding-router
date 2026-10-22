@@ -12,6 +12,10 @@ export const Statistics: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchStats = async () => {
+    if (!window.acrApi) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const data = await window.acrApi.getStatistics();

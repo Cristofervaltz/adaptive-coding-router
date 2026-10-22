@@ -58,6 +58,8 @@ const taskScheduler = new TaskScheduler(
 );
 
 function createWindow(): void {
+  const preloadPath = path.join(__dirname, 'preload.js');
+
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 820,
@@ -67,15 +69,26 @@ function createWindow(): void {
     title: 'Adaptive Coding Router',
     titleBarStyle: 'default',
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: preloadPath,
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
     },
   });
 
-  if (process.env.VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+  const devUrl = process.env.VITE_DEV_SERVER_URL;
+  if (devUrl) {
+    const loadDev = (retries = 15, delay = 400) => {
+      mainWindow?.loadURL(devUrl).catch((err) => {
+        if (retries > 0) {
+          setTimeout(() => loadDev(retries - 1, delay), delay);
+        } else {
+          console.error('[Electron] Dev server unreachable, falling back to dist/index.html', err);
+          mainWindow?.loadFile(path.join(__dirname, '../dist/index.html'));
+        }
+      });
+    };
+    loadDev();
   } else {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }

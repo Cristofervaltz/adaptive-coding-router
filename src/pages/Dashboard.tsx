@@ -26,7 +26,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [prompt, setPrompt] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mode, setMode] = useState<'auto' | 'manual'>('auto');
-  const [selectedModel, setSelectedModel] = useState(settings.manualModel || 'GPT-6.1 Sol Medium');
+  const [selectedModel, setSelectedModel] = useState(settings?.manualModel || 'GPT-6.1 Sol Medium');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
