@@ -103,13 +103,48 @@ export class OpenCodeProvider implements AgentProvider {
       // detection failure
     }
 
+    // Dynamically discover models from CLI or local model runtimes
+    let discoveredModels: string[] = [];
+    try {
+      const modelsOut = execSync(`"${this.cliPath}" models`, {
+        encoding: 'utf-8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+        timeout: 3000,
+      });
+      const lines = modelsOut
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l && !l.startsWith('#'));
+      if (lines.length > 0) discoveredModels = lines;
+    } catch {
+      try {
+        const ollamaOut = execSync('ollama list', {
+          encoding: 'utf-8',
+          stdio: ['ignore', 'pipe', 'ignore'],
+          timeout: 2000,
+        });
+        const lines = ollamaOut
+          .split('\n')
+          .slice(1)
+          .map((l) => l.trim().split(/\s+/)[0])
+          .filter(Boolean);
+        if (lines.length > 0) discoveredModels = lines;
+      } catch {
+        // fallback
+      }
+    }
+
+    if (discoveredModels.length === 0) {
+      discoveredModels = [
+        'qwen2.5-coder:32b',
+        'deepseek-coder-v2',
+        'llama-3.3-70b',
+        'opencode-default',
+      ];
+    }
+
     return {
-      models: [
-        'Qwen-2.5-Coder-32B',
-        'DeepSeek-Coder-V2',
-        'Llama-3.3-70B',
-        'OpenCode-Default',
-      ],
+      models: discoveredModels,
       supportsReasoning: true,
       supportsStreaming: true,
       authStatus,

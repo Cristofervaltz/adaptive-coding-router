@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Project, Task, RunEvent, SubscriptionSettings } from '../types';
+import { Project, Task, RunEvent, SubscriptionSettings, ProviderStatus } from '../types';
 import { StatusBadge, CategoryBadge } from '../components/TaskBadge';
 import { LiveLogs } from '../components/LiveLogs';
 import { Send, Sliders, ChevronRight, PlayCircle, FolderOpen } from 'lucide-react';
@@ -12,6 +12,7 @@ interface DashboardProps {
   onCreateTask: (prompt: string, manualModel?: string) => Promise<void>;
   events: RunEvent[];
   settings: SubscriptionSettings;
+  providers: ProviderStatus[];
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -22,11 +23,23 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onCreateTask,
   events,
   settings,
+  providers,
 }) => {
   const [prompt, setPrompt] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mode, setMode] = useState<'auto' | 'manual'>('auto');
-  const [selectedModel, setSelectedModel] = useState(settings?.manualModel || 'GPT-6.1 Sol Medium');
+
+  // Discover models dynamically from connected providers
+  const onlineProviders = providers.filter(
+    (p) => p.installed && p.availableModels && p.availableModels.length > 0
+  );
+  const allDiscoveredModels = onlineProviders.flatMap((p) =>
+    p.availableModels.map((m) => ({ id: m, providerName: p.name }))
+  );
+
+  const [selectedModel, setSelectedModel] = useState(
+    settings?.manualModel || (allDiscoveredModels[0]?.id ?? 'gpt-6.1-sol')
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,16 +118,29 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     onChange={(e) => setSelectedModel(e.target.value)}
                     className="bg-transparent text-zinc-200 text-xs focus:outline-none flex-1 font-mono"
                   >
-                    <option value="GPT-6 Luna" className="bg-zinc-900">GPT-6 Luna (Economy)</option>
-                    <option value="GPT-6.1 Sol Medium" className="bg-zinc-900">GPT-6.1 Sol Medium (Standard)</option>
-                    <option value="GPT-6.1 Sol High" className="bg-zinc-900">GPT-6.1 Sol High (Deep Reasoning)</option>
-                    <option value="GPT-6.1 Sol Ultra" className="bg-zinc-900">GPT-6.1 Sol Ultra (Mission Critical)</option>
-                    <option value="Astra High" className="bg-zinc-900">Astra High (Assets & Spatial)</option>
-                    <option value="Gemini 3.8 High" className="bg-zinc-900">Gemini 3.8 High (Google)</option>
-                    <option value="Claude 3.7 Sonnet" className="bg-zinc-900">Claude 3.7 Sonnet (Anthropic)</option>
-                    <option value="Claude 3.5 Sonnet" className="bg-zinc-900">Claude 3.5 Sonnet (Anthropic)</option>
-                    <option value="Qwen-2.5-Coder-32B" className="bg-zinc-900">Qwen-2.5-Coder-32B (OpenCode)</option>
-                    <option value="DeepSeek-Coder-V2" className="bg-zinc-900">DeepSeek-Coder-V2 (OpenCode)</option>
+                    {onlineProviders.length === 0 ? (
+                      <option value="gpt-6.1-sol" className="bg-zinc-900">
+                        gpt-6.1-sol (Default)
+                      </option>
+                    ) : (
+                      onlineProviders.map((prov) => (
+                        <optgroup
+                          key={prov.id}
+                          label={prov.name}
+                          className="bg-zinc-900 text-zinc-400 font-sans"
+                        >
+                          {prov.availableModels.map((modelId) => (
+                            <option
+                              key={modelId}
+                              value={modelId}
+                              className="bg-zinc-900 text-zinc-200 font-mono"
+                            >
+                              {modelId}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))
+                    )}
                   </select>
                 </div>
               )}

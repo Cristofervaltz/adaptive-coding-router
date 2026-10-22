@@ -114,13 +114,36 @@ export class ClaudeProvider implements AgentProvider {
       // detection failure
     }
 
+    // Dynamically discover models or inspect CLI output
+    let discoveredModels: string[] = [];
+    try {
+      const modelsOut = execSync(`"${this.cliPath}" models`, {
+        encoding: 'utf-8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+        timeout: 3000,
+      });
+      const lines = modelsOut
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l && !l.startsWith('#') && !l.startsWith('Usage'));
+      if (lines.length > 0) {
+        discoveredModels = lines;
+      }
+    } catch {
+      // fallback to dynamic discovery defaults
+    }
+
+    if (discoveredModels.length === 0) {
+      discoveredModels = [
+        'claude-3-7-sonnet',
+        'claude-3-5-sonnet',
+        'claude-3-5-haiku',
+        'claude-3-opus',
+      ];
+    }
+
     return {
-      models: [
-        'Claude 3.7 Sonnet',
-        'Claude 3.5 Sonnet',
-        'Claude 3.5 Haiku',
-        'Claude 3 Opus',
-      ],
+      models: discoveredModels,
       supportsReasoning: true,
       supportsStreaming: true,
       authStatus,

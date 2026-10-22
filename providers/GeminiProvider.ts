@@ -66,8 +66,29 @@ export class GeminiProvider implements AgentProvider {
       // ignore
     }
 
+    // Dynamically discover models from CLI
+    let discoveredModels: string[] = [];
+    try {
+      const modelsOut = execSync(`"${this.cliPath}" models`, {
+        encoding: 'utf-8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+        timeout: 3000,
+      });
+      const lines = modelsOut
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l && !l.startsWith('#'));
+      if (lines.length > 0) discoveredModels = lines;
+    } catch {
+      // fallback
+    }
+
+    if (discoveredModels.length === 0) {
+      discoveredModels = ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-3.8-high'];
+    }
+
     return {
-      models: ['Gemini 3.8 High'],
+      models: discoveredModels,
       supportsReasoning: true,
       supportsStreaming: true,
       authStatus,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SubscriptionSettings } from '../types';
+import { SubscriptionSettings, ProviderStatus } from '../types';
 import {
   Settings as SettingsIcon,
   Shield,
@@ -12,13 +12,18 @@ import {
 
 interface SettingsProps {
   onSettingsSaved?: () => void;
+  providers?: ProviderStatus[];
 }
 
-export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved }) => {
+export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved, providers = [] }) => {
   const [settings, setSettings] = useState<SubscriptionSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  const activeProviders = providers.filter(
+    (p) => p.installed && p.availableModels && p.availableModels.length > 0
+  );
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -340,16 +345,27 @@ export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved }) => {
                 onChange={(e) => setSettings({ ...settings, manualModel: e.target.value })}
                 className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700 font-mono"
               >
-                <option value="GPT-6 Luna">GPT-6 Luna (Economy)</option>
-                <option value="GPT-6.1 Sol Medium">GPT-6.1 Sol Medium (Standard)</option>
-                <option value="GPT-6.1 Sol High">GPT-6.1 Sol High (Deep Reasoning)</option>
-                <option value="GPT-6.1 Sol Ultra">GPT-6.1 Sol Ultra (Mission Critical)</option>
-                <option value="Astra High">Astra High (Assets & Spatial)</option>
-                <option value="Gemini 3.8 High">Gemini 3.8 High (Google)</option>
-                <option value="Claude 3.7 Sonnet">Claude 3.7 Sonnet (Anthropic)</option>
-                <option value="Claude 3.5 Sonnet">Claude 3.5 Sonnet (Anthropic)</option>
-                <option value="Qwen-2.5-Coder-32B">Qwen-2.5-Coder-32B (OpenCode)</option>
-                <option value="DeepSeek-Coder-V2">DeepSeek-Coder-V2 (OpenCode)</option>
+                {activeProviders.length === 0 ? (
+                  <option value="gpt-6.1-sol">gpt-6.1-sol</option>
+                ) : (
+                  activeProviders.map((prov) => (
+                    <optgroup
+                      key={prov.id}
+                      label={prov.name}
+                      className="bg-zinc-900 text-zinc-400 font-sans"
+                    >
+                      {prov.availableModels.map((modelId) => (
+                        <option
+                          key={modelId}
+                          value={modelId}
+                          className="bg-zinc-900 text-zinc-200 font-mono"
+                        >
+                          {modelId}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))
+                )}
               </select>
             </div>
           </div>

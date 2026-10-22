@@ -19,7 +19,7 @@ const defaultSettings: SubscriptionSettings = {
   claudePath: 'claude',
   opencodePath: 'opencode',
   routingMode: 'auto',
-  manualModel: 'GPT-6.1 Sol Medium',
+  manualModel: 'gpt-6.1-sol',
 };
 
 export const App: React.FC = () => {
@@ -171,11 +171,12 @@ export const App: React.FC = () => {
             onCreateTask={handleCreateTask}
             events={events}
             settings={settings}
+            providers={providers}
           />
         ) : currentTab === 'stats' ? (
           <Statistics />
         ) : (
-          <Settings onSettingsSaved={refreshSettings} />
+          <Settings onSettingsSaved={refreshSettings} providers={providers} />
         )}
       </main>
     </div>

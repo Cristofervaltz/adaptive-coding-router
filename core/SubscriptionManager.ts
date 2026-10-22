@@ -14,7 +14,7 @@ export class SubscriptionManager {
     claudePath: 'claude',
     opencodePath: 'opencode',
     routingMode: 'auto',
-    manualModel: 'GPT-6.1 Sol Medium',
+    manualModel: 'gpt-6.1-sol',
   };
 
   constructor(private db: AppDatabase) {}

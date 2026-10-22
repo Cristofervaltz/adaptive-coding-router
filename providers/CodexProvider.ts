@@ -100,14 +100,30 @@ export class CodexProvider implements AgentProvider {
       // detection failure
     }
 
+    // Dynamically discover models from Codex cache or CLI
+    const userProfile = process.env.USERPROFILE || '';
+    const modelsCacheFile = path.join(userProfile, '.codex', 'models_cache.json');
+    let discoveredModels: string[] = [];
+
+    if (fs.existsSync(modelsCacheFile)) {
+      try {
+        const cacheData = JSON.parse(fs.readFileSync(modelsCacheFile, 'utf-8'));
+        if (Array.isArray(cacheData.models)) {
+          discoveredModels = cacheData.models
+            .map((m: any) => m.slug || m.id || m.display_name)
+            .filter(Boolean);
+        }
+      } catch {
+        // ignore parse error
+      }
+    }
+
+    if (discoveredModels.length === 0) {
+      discoveredModels = ['gpt-6.1-sol', 'gpt-6-astra', 'gpt-6-luna', 'gpt-reserve'];
+    }
+
     return {
-      models: [
-        'GPT-6 Luna',
-        'GPT-6.1 Sol Medium',
-        'GPT-6.1 Sol High',
-        'GPT-6.1 Sol Ultra',
-        'Astra High',
-      ],
+      models: discoveredModels,
       supportsReasoning: true,
       supportsStreaming: true,
       authStatus,
