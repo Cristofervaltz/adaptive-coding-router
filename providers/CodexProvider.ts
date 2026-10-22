@@ -1,4 +1,6 @@
 import { spawn, execSync, ChildProcess } from 'node:child_process';
+import path from 'node:path';
+import fs from 'node:fs';
 import treeKill from 'tree-kill';
 import { AgentProvider, AgentTask, ExecutionContext } from './AgentProvider';
 import { ProviderCapabilities } from '../src/types';
@@ -13,13 +15,43 @@ export class CodexProvider implements AgentProvider {
     if (cliPath) {
       this.cliPath = cliPath;
     }
+    this.resolveWindowsPath();
   }
 
-  public setCliPath(path: string): void {
-    this.cliPath = path || 'codex';
+  public setCliPath(customPath: string): void {
+    this.cliPath = customPath || 'codex';
+    this.resolveWindowsPath();
+  }
+
+  private resolveWindowsPath(): void {
+    if (this.cliPath && this.cliPath !== 'codex' && fs.existsSync(this.cliPath)) {
+      return;
+    }
+
+    try {
+      execSync('codex --version', { stdio: 'ignore', timeout: 2000 });
+      return;
+    } catch {
+      // Look in standard Windows AppData folder
+      const localAppData = process.env.LOCALAPPDATA;
+      if (localAppData) {
+        const binRoot = path.join(localAppData, 'OpenAI', 'Codex', 'bin');
+        if (fs.existsSync(binRoot)) {
+          const entries = fs.readdirSync(binRoot);
+          for (const entry of entries) {
+            const candidate = path.join(binRoot, entry, 'codex.exe');
+            if (fs.existsSync(candidate)) {
+              this.cliPath = candidate;
+              return;
+            }
+          }
+        }
+      }
+    }
   }
 
   public async detect(): Promise<boolean> {
+    this.resolveWindowsPath();
     try {
       execSync(`"${this.cliPath}" --version`, {
         encoding: 'utf-8',
@@ -53,15 +85,16 @@ export class CodexProvider implements AgentProvider {
         stdio: ['ignore', 'pipe', 'ignore'],
       }).trim();
 
-      // Check auth status
-      try {
-        const authOut = execSync(`"${this.cliPath}" auth status`, {
-          encoding: 'utf-8',
-          stdio: ['ignore', 'pipe', 'ignore'],
-        });
-        authStatus = authOut.toLowerCase().includes('logged in') || authOut.toLowerCase().includes('active');
-      } catch {
-        authStatus = false;
+      // Check auth status via local auth config
+      const userProfile = process.env.USERPROFILE || '';
+      const authFile = path.join(userProfile, '.codex', 'auth.json');
+      if (fs.existsSync(authFile)) {
+        try {
+          const authContent = fs.readFileSync(authFile, 'utf-8');
+          authStatus = authContent.includes('token') || authContent.includes('chatgpt') || authContent.includes('key');
+        } catch {
+          authStatus = true;
+        }
       }
     } catch {
       // detection failure
