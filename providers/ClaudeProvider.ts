@@ -81,10 +81,10 @@ export class ClaudeProvider implements AgentProvider {
     if (!isInstalled) {
       return {
         models: [
-          'Claude 3.7 Sonnet',
-          'Claude 3.5 Sonnet',
-          'Claude 3.5 Haiku',
-          'Claude 3 Opus',
+          'claude-5-5-sonnet',
+          'claude-5-5-opus-thinking',
+          'claude-5-5-haiku',
+          'claude-sonnet-4-6',
         ],
         supportsReasoning: true,
         supportsStreaming: true,
@@ -144,10 +144,10 @@ export class ClaudeProvider implements AgentProvider {
 
     if (discoveredModels.length === 0) {
       discoveredModels = [
-        'claude-3-7-sonnet',
-        'claude-3-5-sonnet',
-        'claude-3-5-haiku',
-        'claude-3-opus',
+        'claude-5-5-sonnet',
+        'claude-5-5-opus-thinking',
+        'claude-5-5-haiku',
+        'claude-sonnet-4-6',
       ];
     }
 

@@ -32,7 +32,7 @@ Each task runs in an isolated Git worktree created in `.git/acr-worktrees/<task-
        |            |                       |            |
        v            v                       v            v
   OpenAI Codex  Google Antigravity    Claude Code    OpenCode CLI
-  (gpt-6.1-sol) (gemini-3.8-flash)   (claude-sonnet) (qwen2.5-coder)
+  (gpt-6.1-sol) (gemini-3.8-flash)   (claude-5-5-sonnet) (qwen2.5-coder)
        |            |                       |            |
        +------------+-----------+-----------+------------+
                                 |
@@ -62,10 +62,10 @@ ACR queries connected CLIs at startup (`agy models`, `opencode models`, Codex mo
 
 | Tier | Complexity Range | Default Cost Weight | Example Models |
 | :--- | :--- | :--- | :--- |
-| `economy` | 0 - 34 | 0.4x | `gemini-3.8-flash-low`, `claude-3-5-haiku` |
+| `economy` | 0 - 34 | 0.4x | `gemini-3.8-flash-low`, `claude-5-5-haiku` |
 | `standard` | 30 - 69 | 1.0x | `gemini-3.8-flash-medium`, `gpt-oss-120b`, `qwen2.5-coder` |
-| `high_reasoning` | 65 - 89 | 2.0x | `gemini-3.8-flash-high`, `claude-sonnet-4-6`, `gpt-6.1-sol` |
-| `ultra_expert` | 85 - 100 | 4.0x | `claude-opus-4-6-thinking`, `gpt-6-astra` |
+| `high_reasoning` | 65 - 89 | 2.0x | `gemini-3.8-flash-high`, `claude-5-5-sonnet`, `gpt-6.1-sol` |
+| `ultra_expert` | 85 - 100 | 4.0x | `claude-5-5-opus-thinking`, `gpt-6-astra` |
 
 ### Quota Protection (Reserve OpenAI)
 When Reserve OpenAI mode is active, the router adds a 10-point cost penalty to OpenAI models. Tasks with complexity below 70 are directed to alternative or local models (Google Antigravity, OpenCode), reserving OpenAI quota for tasks flagged as high complexity or architectural refactoring.
