@@ -239,6 +239,22 @@ export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved, providers =
 
             <div>
               <label className="block font-medium text-zinc-300 mb-1">
+                Google Antigravity CLI Binary or Command
+              </label>
+              <input
+                type="text"
+                value={settings.antigravityPath || ''}
+                onChange={(e) => setSettings({ ...settings, antigravityPath: e.target.value })}
+                placeholder="agy or C:\Users\...\AppData\Local\agy\bin\agy.exe"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-zinc-700"
+              />
+              <span className="text-[11px] text-zinc-500 mt-0.5 block">
+                Auto-resolved from AppData\Local\agy\bin\agy.exe, Antigravity IDE, or PATH.
+              </span>
+            </div>
+
+            <div>
+              <label className="block font-medium text-zinc-300 mb-1">
                 Anthropic Claude CLI Binary or Command
               </label>
               <input

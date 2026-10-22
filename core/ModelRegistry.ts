@@ -5,7 +5,7 @@ export type ModelTier = 'economy' | 'standard' | 'high_reasoning' | 'ultra_exper
 export interface DiscoveredModel {
   id: string;
   name: string;
-  provider: 'codex' | 'gemini' | 'claude' | 'opencode';
+  provider: 'codex' | 'gemini' | 'antigravity' | 'claude' | 'opencode';
   tier: ModelTier;
   complexityMin: number;
   complexityMax: number;
@@ -19,7 +19,7 @@ export class ModelRegistry {
   public classifyModel(
     rawId: string,
     rawName: string,
-    provider: 'codex' | 'gemini' | 'claude' | 'opencode',
+    provider: 'codex' | 'gemini' | 'antigravity' | 'claude' | 'opencode',
     supportedReasoningLevels?: string[]
   ): DiscoveredModel {
     const id = rawId.toLowerCase();
@@ -33,19 +33,6 @@ export class ModelRegistry {
 
     // Hierarchy and tier heuristics
     if (
-      id.includes('luna') ||
-      id.includes('haiku') ||
-      id.includes('flash') ||
-      id.includes('mini') ||
-      id.includes('lite') ||
-      id.includes('7b') ||
-      id.includes('8b')
-    ) {
-      tier = 'economy';
-      complexityMin = 0;
-      complexityMax = 34;
-      costMultiplier = 0.4;
-    } else if (
       id.includes('ultra') ||
       id.includes('max') ||
       id.includes('opus') ||
@@ -56,18 +43,32 @@ export class ModelRegistry {
       complexityMax = 100;
       costMultiplier = 4.0;
     } else if (
+      id.includes('flash-high') ||
       id.includes('astra') ||
-      id.includes('r1') ||
+      id.includes('sonnet') ||
       id.includes('high') ||
+      id.includes('r1') ||
       id.includes('o1') ||
       id.includes('o3') ||
-      id.includes('70b') ||
-      id.includes('sonnet')
+      id.includes('70b')
     ) {
       tier = 'high_reasoning';
       complexityMin = 65;
       complexityMax = 89;
       costMultiplier = 2.0;
+    } else if (
+      id.includes('flash-low') ||
+      id.includes('luna') ||
+      id.includes('haiku') ||
+      id.includes('mini') ||
+      id.includes('lite') ||
+      id.includes('7b') ||
+      id.includes('8b')
+    ) {
+      tier = 'economy';
+      complexityMin = 0;
+      complexityMax = 34;
+      costMultiplier = 0.4;
     } else {
       tier = 'standard';
       complexityMin = 30;

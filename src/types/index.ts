@@ -61,7 +61,7 @@ export interface Task {
 export interface Run {
   id: string;
   taskId: string;
-  provider: 'codex' | 'gemini' | 'claude' | 'opencode' | 'mock';
+  provider: 'codex' | 'gemini' | 'antigravity' | 'claude' | 'opencode' | 'mock';
   model: string;
   reasoningEffort?: string;
   status: 'running' | 'completed' | 'failed' | 'cancelled';
@@ -103,7 +103,7 @@ export interface ProviderCapabilities {
 }
 
 export interface ProviderStatus {
-  id: 'codex' | 'gemini' | 'claude' | 'opencode';
+  id: 'codex' | 'gemini' | 'antigravity' | 'claude' | 'opencode';
   name: string;
   installed: boolean;
   version?: string;
@@ -122,6 +122,7 @@ export interface SubscriptionSettings {
   timeoutSeconds: number;
   codexPath: string;
   geminiPath: string;
+  antigravityPath: string;
   claudePath: string;
   opencodePath: string;
   routingMode: 'auto' | 'manual';

@@ -3,7 +3,7 @@ import { SubscriptionManager } from './SubscriptionManager';
 import { ModelRegistry, ModelTier } from './ModelRegistry';
 
 export interface RouteDecision {
-  provider: 'codex' | 'gemini' | 'claude' | 'opencode';
+  provider: 'codex' | 'gemini' | 'antigravity' | 'claude' | 'opencode';
   model: string;
   reasoningEffort?: string;
   explanation: string;
@@ -145,10 +145,11 @@ export class ModelRouter {
 
   private inferProvider(
     model: string
-  ): 'codex' | 'gemini' | 'claude' | 'opencode' {
+  ): 'codex' | 'gemini' | 'antigravity' | 'claude' | 'opencode' {
     const l = model.toLowerCase();
     if (l.includes('claude')) return 'claude';
-    if (l.includes('gemini')) return 'gemini';
+    if (l.includes('agy') || l.includes('antigravity')) return 'antigravity';
+    if (l.includes('gemini')) return 'antigravity';
     if (
       l.includes('qwen') ||
       l.includes('deepseek') ||

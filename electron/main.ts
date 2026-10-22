@@ -9,6 +9,7 @@ import { ProjectManager } from '../core/ProjectManager';
 import { SubscriptionManager } from '../core/SubscriptionManager';
 import { CodexProvider } from '../providers/CodexProvider';
 import { GeminiProvider } from '../providers/GeminiProvider';
+import { AntigravityProvider } from '../providers/AntigravityProvider';
 import { ClaudeProvider } from '../providers/ClaudeProvider';
 import { OpenCodeProvider } from '../providers/OpenCodeProvider';
 import { ExecutionManager } from '../core/ExecutionManager';
@@ -31,12 +32,14 @@ const subscriptionManager = new SubscriptionManager(db);
 
 const codexProvider = new CodexProvider(subscriptionManager.getSettings().codexPath);
 const geminiProvider = new GeminiProvider(subscriptionManager.getSettings().geminiPath);
+const antigravityProvider = new AntigravityProvider(subscriptionManager.getSettings().antigravityPath);
 const claudeProvider = new ClaudeProvider(subscriptionManager.getSettings().claudePath);
 const opencodeProvider = new OpenCodeProvider(subscriptionManager.getSettings().opencodePath);
 const executionManager = new ExecutionManager(
   db,
   codexProvider,
   geminiProvider,
+  antigravityProvider,
   claudeProvider,
   opencodeProvider
 );
@@ -132,45 +135,7 @@ function registerIpcHandlers(): void {
 
   // Providers
   const detectProvidersInternal = async (): Promise<ProviderStatus[]> => {
-    const codexCaps = await codexProvider.getCapabilities();
-    const geminiCaps = await geminiProvider.getCapabilities();
-    const claudeCaps = await claudeProvider.getCapabilities();
-    const opencodeCaps = await opencodeProvider.getCapabilities();
-
-    return [
-      {
-        id: 'codex',
-        name: 'OpenAI Codex CLI',
-        installed: await codexProvider.detect(),
-        version: codexCaps.version,
-        authenticated: codexCaps.authStatus,
-        availableModels: codexCaps.models,
-      },
-      {
-        id: 'gemini',
-        name: 'Google Gemini CLI',
-        installed: await geminiProvider.detect(),
-        version: geminiCaps.version,
-        authenticated: geminiCaps.authStatus,
-        availableModels: geminiCaps.models,
-      },
-      {
-        id: 'claude',
-        name: 'Anthropic Claude CLI',
-        installed: await claudeProvider.detect(),
-        version: claudeCaps.version,
-        authenticated: claudeCaps.authStatus,
-        availableModels: claudeCaps.models,
-      },
-      {
-        id: 'opencode',
-        name: 'OpenCode CLI',
-        installed: await opencodeProvider.detect(),
-        version: opencodeCaps.version,
-        authenticated: opencodeCaps.authStatus,
-        availableModels: opencodeCaps.models,
-      },
-    ];
+    return executionManager.getAvailableProviderStatuses();
   };
 
   ipcMain.handle('providers:getStatus', async () => {
@@ -300,6 +265,7 @@ function registerIpcHandlers(): void {
     const saved = subscriptionManager.updateSettings(updatedSettings);
     if (saved.codexPath) codexProvider.setCliPath(saved.codexPath);
     if (saved.geminiPath) geminiProvider.setCliPath(saved.geminiPath);
+    if (saved.antigravityPath) antigravityProvider.setCliPath(saved.antigravityPath);
     if (saved.claudePath) claudeProvider.setCliPath(saved.claudePath);
     if (saved.opencodePath) opencodeProvider.setCliPath(saved.opencodePath);
     return saved;

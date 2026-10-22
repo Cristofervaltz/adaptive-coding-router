@@ -118,6 +118,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>
                 {p.id === 'codex'
                   ? 'Codex'
+                  : p.id === 'antigravity'
+                  ? 'Antigravity'
                   : p.id === 'gemini'
                   ? 'Gemini'
                   : p.id === 'claude'

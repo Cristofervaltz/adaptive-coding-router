@@ -115,8 +115,9 @@ export class TaskScheduler {
       worktreePath = await this.gitManager.createWorktree(project.path, task.id);
 
       while (attempt <= this.subscriptionManager.getSettings().maxAttempts && !finalSuccess) {
-        // Route model
-        const route = this.router.route(task.assessment, [], manualModel);
+        // Route model dynamically based on live provider statuses
+        const availableProviders = await this.executionManager.getAvailableProviderStatuses();
+        const route = this.router.route(task.assessment, availableProviders, manualModel);
         if (route.model.includes('Ultra')) {
           ultraAttempts += 1;
         }

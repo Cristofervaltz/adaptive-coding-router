@@ -2,10 +2,11 @@ import crypto from 'node:crypto';
 import { AgentProvider, AgentTask } from '../providers/AgentProvider';
 import { CodexProvider } from '../providers/CodexProvider';
 import { GeminiProvider } from '../providers/GeminiProvider';
+import { AntigravityProvider } from '../providers/AntigravityProvider';
 import { ClaudeProvider } from '../providers/ClaudeProvider';
 import { OpenCodeProvider } from '../providers/OpenCodeProvider';
 import { AppDatabase } from '../storage/database';
-import { RunEvent } from '../src/types';
+import { RunEvent, ProviderStatus } from '../src/types';
 
 export class ExecutionManager {
   private providers: Map<string, AgentProvider> = new Map();
@@ -14,11 +15,13 @@ export class ExecutionManager {
     private db: AppDatabase,
     codexProvider: CodexProvider,
     geminiProvider: GeminiProvider,
+    antigravityProvider: AntigravityProvider,
     claudeProvider: ClaudeProvider,
     opencodeProvider: OpenCodeProvider
   ) {
     this.providers.set('codex', codexProvider);
     this.providers.set('gemini', geminiProvider);
+    this.providers.set('antigravity', antigravityProvider);
     this.providers.set('claude', claudeProvider);
     this.providers.set('opencode', opencodeProvider);
   }
@@ -27,10 +30,27 @@ export class ExecutionManager {
     return this.providers.get(id);
   }
 
+  public async getAvailableProviderStatuses(): Promise<ProviderStatus[]> {
+    const list: ProviderStatus[] = [];
+    for (const [id, provider] of this.providers.entries()) {
+      const installed = await provider.detect();
+      const caps = await provider.getCapabilities();
+      list.push({
+        id: id as any,
+        name: provider.name,
+        installed,
+        version: caps.version,
+        authenticated: caps.authStatus,
+        availableModels: caps.models,
+      });
+    }
+    return list;
+  }
+
   public async executeRun(
     runId: string,
     task: AgentTask,
-    providerId: 'codex' | 'gemini' | 'claude' | 'opencode',
+    providerId: 'codex' | 'gemini' | 'antigravity' | 'claude' | 'opencode',
     timeoutMs: number,
     onEmitEvent: (event: RunEvent) => void
   ): Promise<{ exitCode: number; errorMessage?: string }> {

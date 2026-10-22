@@ -11,6 +11,7 @@ export class SubscriptionManager {
     timeoutSeconds: 300,
     codexPath: 'codex',
     geminiPath: 'gemini',
+    antigravityPath: 'agy',
     claudePath: 'claude',
     opencodePath: 'opencode',
     routingMode: 'auto',
@@ -41,7 +42,7 @@ export class SubscriptionManager {
     if (lower.includes('opencode') || lower.includes('qwen') || lower.includes('deepseek') || lower.includes('llama')) {
       return 'opencode';
     }
-    if (lower.includes('gemini')) {
+    if (lower.includes('gemini') || lower.includes('antigravity') || lower.includes('agy')) {
       return 'google';
     }
     return 'openai';

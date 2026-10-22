@@ -16,6 +16,7 @@ const defaultSettings: SubscriptionSettings = {
   timeoutSeconds: 300,
   codexPath: 'codex',
   geminiPath: 'gemini',
+  antigravityPath: 'agy',
   claudePath: 'claude',
   opencodePath: 'opencode',
   routingMode: 'auto',

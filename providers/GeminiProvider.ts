@@ -1,4 +1,6 @@
 import { spawn, execSync, ChildProcess } from 'node:child_process';
+import path from 'node:path';
+import fs from 'node:fs';
 import treeKill from 'tree-kill';
 import { AgentProvider, AgentTask, ExecutionContext } from './AgentProvider';
 import { ProviderCapabilities } from '../src/types';
@@ -13,13 +15,44 @@ export class GeminiProvider implements AgentProvider {
     if (cliPath) {
       this.cliPath = cliPath;
     }
+    this.resolveWindowsPath();
   }
 
   public setCliPath(path: string): void {
     this.cliPath = path || 'gemini';
+    this.resolveWindowsPath();
+  }
+
+  private resolveWindowsPath(): void {
+    if (this.cliPath && this.cliPath !== 'gemini' && fs.existsSync(this.cliPath)) {
+      return;
+    }
+
+    try {
+      execSync('gemini --version', { stdio: 'ignore', timeout: 2000 });
+      this.cliPath = 'gemini';
+      return;
+    } catch {
+      // Continue to known directory locations
+    }
+
+    const appData = process.env.APPDATA || '';
+    const localAppData = process.env.LOCALAPPDATA || '';
+    const candidates = [
+      path.join(appData, 'npm', 'gemini.cmd'),
+      path.join(localAppData, 'Programs', 'gemini', 'gemini.exe'),
+    ];
+
+    for (const candidate of candidates) {
+      if (candidate && fs.existsSync(candidate)) {
+        this.cliPath = candidate;
+        return;
+      }
+    }
   }
 
   public async detect(): Promise<boolean> {
+    this.resolveWindowsPath();
     try {
       execSync(`"${this.cliPath}" --version`, {
         encoding: 'utf-8',
