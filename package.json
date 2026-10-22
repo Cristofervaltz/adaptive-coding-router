@@ -1,0 +1,42 @@
+{
+  "name": "adaptive-coding-router",
+  "version": "1.2.0",
+  "description": "Adaptive Coding Router (ACR) - Desktop router for AI coding agents",
+  "main": "dist-electron/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "electron:dev": "vite",
+    "start": "electron ."
+  },
+  "keywords": [
+    "electron",
+    "ai",
+    "coding",
+    "router"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "autoprefixer": "^10.6.1",
+    "clsx": "^2.1.1",
+    "electron": "^45.0.0",
+    "lucide-react": "^1.61.0",
+    "postcss": "^8.5.31",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tailwind-merge": "^3.7.0",
+    "tailwindcss": "^4.3.3",
+    "tree-kill": "^1.2.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vite-plugin-electron": "^1.1.2",
+    "vite-plugin-electron-renderer": "^1.0.0"
+  }
+}

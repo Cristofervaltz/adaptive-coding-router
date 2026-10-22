@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Production build outputs
+dist/
+dist-electron/
+
+# Local SQLite databases & test workspaces
+*.db
+*.db-wal
+*.db-shm
+.acr-worktrees/
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
