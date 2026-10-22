@@ -1,7 +1,6 @@
 import crypto from 'node:crypto';
 import { AgentProvider, AgentTask } from '../providers/AgentProvider';
 import { CodexProvider } from '../providers/CodexProvider';
-import { GeminiProvider } from '../providers/GeminiProvider';
 import { AntigravityProvider } from '../providers/AntigravityProvider';
 import { ClaudeProvider } from '../providers/ClaudeProvider';
 import { OpenCodeProvider } from '../providers/OpenCodeProvider';
@@ -14,13 +13,11 @@ export class ExecutionManager {
   constructor(
     private db: AppDatabase,
     codexProvider: CodexProvider,
-    geminiProvider: GeminiProvider,
     antigravityProvider: AntigravityProvider,
     claudeProvider: ClaudeProvider,
     opencodeProvider: OpenCodeProvider
   ) {
     this.providers.set('codex', codexProvider);
-    this.providers.set('gemini', geminiProvider);
     this.providers.set('antigravity', antigravityProvider);
     this.providers.set('claude', claudeProvider);
     this.providers.set('opencode', opencodeProvider);
@@ -50,7 +47,7 @@ export class ExecutionManager {
   public async executeRun(
     runId: string,
     task: AgentTask,
-    providerId: 'codex' | 'gemini' | 'antigravity' | 'claude' | 'opencode',
+    providerId: 'codex' | 'antigravity' | 'claude' | 'opencode',
     timeoutMs: number,
     onEmitEvent: (event: RunEvent) => void
   ): Promise<{ exitCode: number; errorMessage?: string }> {

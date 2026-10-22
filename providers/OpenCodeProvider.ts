@@ -30,20 +30,28 @@ export class OpenCodeProvider implements AgentProvider {
 
     try {
       execSync('opencode --version', { stdio: 'ignore', timeout: 2000 });
+      this.cliPath = 'opencode';
       return;
     } catch {
       // Check global npm directory
-      const appData = process.env.APPDATA;
-      if (appData) {
-        const npmCandidate = path.join(appData, 'npm', 'opencode.cmd');
-        if (fs.existsSync(npmCandidate)) {
-          this.cliPath = npmCandidate;
+      const appData = process.env.APPDATA || '';
+      const localAppData = process.env.LOCALAPPDATA || '';
+      const userProfile = process.env.USERPROFILE || '';
+
+      const candidates = [
+        path.join(appData, 'npm', 'opencode.cmd'),
+        path.join(localAppData, 'npm', 'opencode.cmd'),
+        path.join(userProfile, '.npm-global', 'opencode.cmd'),
+      ];
+
+      for (const candidate of candidates) {
+        if (candidate && fs.existsSync(candidate)) {
+          this.cliPath = candidate;
           return;
         }
       }
 
       // Check Python scripts directory
-      const localAppData = process.env.LOCALAPPDATA;
       if (localAppData) {
         const pythonDir = path.join(localAppData, 'Programs', 'Python');
         if (fs.existsSync(pythonDir)) {

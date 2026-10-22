@@ -15,7 +15,6 @@ const defaultSettings: SubscriptionSettings = {
   maxAttempts: 3,
   timeoutSeconds: 300,
   codexPath: 'codex',
-  geminiPath: 'gemini',
   antigravityPath: 'agy',
   claudePath: 'claude',
   opencodePath: 'opencode',

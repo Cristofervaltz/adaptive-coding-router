@@ -8,7 +8,6 @@ import { AppDatabase } from '../storage/database';
 import { ProjectManager } from '../core/ProjectManager';
 import { SubscriptionManager } from '../core/SubscriptionManager';
 import { CodexProvider } from '../providers/CodexProvider';
-import { GeminiProvider } from '../providers/GeminiProvider';
 import { AntigravityProvider } from '../providers/AntigravityProvider';
 import { ClaudeProvider } from '../providers/ClaudeProvider';
 import { OpenCodeProvider } from '../providers/OpenCodeProvider';
@@ -31,14 +30,12 @@ const projectManager = new ProjectManager(db);
 const subscriptionManager = new SubscriptionManager(db);
 
 const codexProvider = new CodexProvider(subscriptionManager.getSettings().codexPath);
-const geminiProvider = new GeminiProvider(subscriptionManager.getSettings().geminiPath);
 const antigravityProvider = new AntigravityProvider(subscriptionManager.getSettings().antigravityPath);
 const claudeProvider = new ClaudeProvider(subscriptionManager.getSettings().claudePath);
 const opencodeProvider = new OpenCodeProvider(subscriptionManager.getSettings().opencodePath);
 const executionManager = new ExecutionManager(
   db,
   codexProvider,
-  geminiProvider,
   antigravityProvider,
   claudeProvider,
   opencodeProvider
@@ -264,7 +261,6 @@ function registerIpcHandlers(): void {
   ipcMain.handle('settings:save', async (_event, updatedSettings) => {
     const saved = subscriptionManager.updateSettings(updatedSettings);
     if (saved.codexPath) codexProvider.setCliPath(saved.codexPath);
-    if (saved.geminiPath) geminiProvider.setCliPath(saved.geminiPath);
     if (saved.antigravityPath) antigravityProvider.setCliPath(saved.antigravityPath);
     if (saved.claudePath) claudeProvider.setCliPath(saved.claudePath);
     if (saved.opencodePath) opencodeProvider.setCliPath(saved.opencodePath);

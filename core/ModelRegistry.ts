@@ -5,7 +5,7 @@ export type ModelTier = 'economy' | 'standard' | 'high_reasoning' | 'ultra_exper
 export interface DiscoveredModel {
   id: string;
   name: string;
-  provider: 'codex' | 'gemini' | 'antigravity' | 'claude' | 'opencode';
+  provider: 'codex' | 'antigravity' | 'claude' | 'opencode';
   tier: ModelTier;
   complexityMin: number;
   complexityMax: number;
@@ -19,7 +19,7 @@ export class ModelRegistry {
   public classifyModel(
     rawId: string,
     rawName: string,
-    provider: 'codex' | 'gemini' | 'antigravity' | 'claude' | 'opencode',
+    provider: 'codex' | 'antigravity' | 'claude' | 'opencode',
     supportedReasoningLevels?: string[]
   ): DiscoveredModel {
     const id = rawId.toLowerCase();

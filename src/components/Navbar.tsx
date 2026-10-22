@@ -120,8 +120,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                   ? 'Codex'
                   : p.id === 'antigravity'
                   ? 'Antigravity'
-                  : p.id === 'gemini'
-                  ? 'Gemini'
                   : p.id === 'claude'
                   ? 'Claude'
                   : 'OpenCode'}

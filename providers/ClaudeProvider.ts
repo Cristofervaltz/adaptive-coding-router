@@ -30,25 +30,34 @@ export class ClaudeProvider implements AgentProvider {
 
     try {
       execSync('claude --version', { stdio: 'ignore', timeout: 2000 });
+      this.cliPath = 'claude';
       return;
     } catch {
-      // Check global npm directory or local AppData
-      const appData = process.env.APPDATA;
-      if (appData) {
-        const npmCandidate = path.join(appData, 'npm', 'claude.cmd');
-        if (fs.existsSync(npmCandidate)) {
-          this.cliPath = npmCandidate;
-          return;
-        }
-      }
+      // Continue to known directory locations
+    }
 
-      const localAppData = process.env.LOCALAPPDATA;
-      if (localAppData) {
-        const progCandidate = path.join(localAppData, 'Programs', 'claude', 'claude.exe');
-        if (fs.existsSync(progCandidate)) {
-          this.cliPath = progCandidate;
-          return;
-        }
+    const appData = process.env.APPDATA || '';
+    const localAppData = process.env.LOCALAPPDATA || '';
+    const userProfile = process.env.USERPROFILE || '';
+    const programFiles = process.env.ProgramFiles || 'C:\\Program Files';
+
+    const candidates = [
+      path.join(appData, 'npm', 'claude.cmd'),
+      path.join(localAppData, 'npm', 'claude.cmd'),
+      path.join(userProfile, '.npm-global', 'claude.cmd'),
+      path.join(localAppData, 'pnpm', 'claude.cmd'),
+      path.join(localAppData, 'Yarn', 'bin', 'claude.cmd'),
+      path.join(programFiles, 'nodejs', 'claude.cmd'),
+      path.join(userProfile, '.claude', 'bin', 'claude.exe'),
+      path.join(localAppData, 'Programs', 'claude', 'claude.exe'),
+      path.join(localAppData, 'Programs', 'Claude', 'claude.exe'),
+      path.join(localAppData, 'AnthropicClaude', 'claude.exe'),
+    ];
+
+    for (const candidate of candidates) {
+      if (candidate && fs.existsSync(candidate)) {
+        this.cliPath = candidate;
+        return;
       }
     }
   }
@@ -211,6 +220,10 @@ export class ClaudeProvider implements AgentProvider {
         finalPrompt,
         '--dangerously-skip-permissions',
       ];
+
+      if (task.model) {
+        args.push('--model', task.model);
+      }
 
       context.onEvent({
         type: 'status',
