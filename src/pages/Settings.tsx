@@ -154,11 +154,60 @@ export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved, providers =
               />
             </label>
 
+            {/* Plan selection */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-zinc-800/60">
+              <div>
+                <label className="block font-medium text-zinc-300 mb-1">
+                  OpenAI Subscription Tier
+                </label>
+                <select
+                  value={settings.openAIPlan || 'tier_500'}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      openAIPlan: e.target.value as 'tier_500' | 'pro_200' | 'plus_20',
+                    })
+                  }
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
+                >
+                  <option value="tier_500">$500 Max Tier (No 5-hour rolling limit)</option>
+                  <option value="pro_200">$200 Pro Tier (Higher rate limits)</option>
+                  <option value="plus_20">$20 Plus Tier (Rolling 5-hour message cap)</option>
+                </select>
+                <span className="text-[11px] text-zinc-500 mt-0.5 block">
+                  Select your subscription tier to tune rate limiting and quota penalties.
+                </span>
+              </div>
+
+              <div>
+                <label className="block font-medium text-zinc-300 mb-1">
+                  Claude Subscription Plan
+                </label>
+                <select
+                  value={settings.claudePlan || 'claude_team_5_5'}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      claudePlan: e.target.value as 'claude_team_5_5' | 'claude_pro' | 'api',
+                    })
+                  }
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
+                >
+                  <option value="claude_team_5_5">Team 5.5 (Dedicated Fable 5.5 Quota Pool)</option>
+                  <option value="claude_pro">Claude Pro (Standard Quota)</option>
+                  <option value="api">Anthropic Direct API Key</option>
+                </select>
+                <span className="text-[11px] text-zinc-500 mt-0.5 block">
+                  Manages separate quota pools for Fable 5.5 and Core 5.5 models.
+                </span>
+              </div>
+            </div>
+
             {/* Quota limit and counter */}
-            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-zinc-800/60">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-zinc-800/60">
               <div>
                 <span className="block font-medium text-zinc-300 mb-1">
-                  Normalized OpenAI Budget Limit
+                  OpenAI Compute Budget
                 </span>
                 <input
                   type="number"
@@ -174,13 +223,13 @@ export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved, providers =
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-zinc-300">Recorded Budget Used</span>
+                  <span className="font-medium text-zinc-300">OpenAI Budget Used</span>
                   <button
                     type="button"
                     onClick={() => setSettings({ ...settings, openAIUsed: 0 })}
                     className="text-[10px] text-blue-400 hover:text-blue-300"
                   >
-                    Reset Counter
+                    Reset
                   </button>
                 </div>
                 <input
@@ -189,6 +238,28 @@ export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved, providers =
                   value={settings.openAIUsed}
                   onChange={(e) =>
                     setSettings({ ...settings, openAIUsed: Number(e.target.value) || 0 })
+                  }
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-zinc-700"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium text-zinc-300">Fable 5.5 Used</span>
+                  <button
+                    type="button"
+                    onClick={() => setSettings({ ...settings, claudeFableUsed: 0 })}
+                    className="text-[10px] text-amber-400 hover:text-amber-300"
+                  >
+                    Reset
+                  </button>
+                </div>
+                <input
+                  type="number"
+                  min="0"
+                  value={settings.claudeFableUsed || 0}
+                  onChange={(e) =>
+                    setSettings({ ...settings, claudeFableUsed: Number(e.target.value) || 0 })
                   }
                   className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-zinc-700"
                 />

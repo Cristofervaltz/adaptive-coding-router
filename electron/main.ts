@@ -143,6 +143,11 @@ function registerIpcHandlers(): void {
     return detectProvidersInternal();
   });
 
+  ipcMain.handle('providers:getQuotas', async () => {
+    const statuses = await detectProvidersInternal();
+    return subscriptionManager.getProviderQuotas(statuses);
+  });
+
   // Tasks
   ipcMain.handle('tasks:create', async (_event, projectId: string, prompt: string, manualModel?: string) => {
     const project = projectManager.getProject(projectId);

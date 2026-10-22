@@ -113,10 +113,35 @@ export interface ProviderStatus {
   error?: string;
 }
 
+export interface QuotaPool {
+  id: string;
+  name: string;
+  total: number;
+  used: number;
+  unit: 'percentage' | 'requests' | 'credits' | 'unlimited';
+  resetPeriod?: string;
+  isUnlimited?: boolean;
+  statusText?: string;
+}
+
+export interface ProviderQuota {
+  providerId: 'codex' | 'antigravity' | 'claude' | 'opencode';
+  providerName: string;
+  tierPlan: string;
+  isOnline: boolean;
+  pools: QuotaPool[];
+}
+
 export interface SubscriptionSettings {
   reserveOpenAI: boolean;
   openAIBudget: number;
   openAIUsed: number;
+  openAIPlan: 'tier_500' | 'pro_200' | 'plus_20';
+  claudePlan: 'claude_team_5_5' | 'claude_pro' | 'api';
+  antigravityCreditsBudget: number;
+  antigravityCreditsUsed: number;
+  claudeGeneralUsed: number;
+  claudeFableUsed: number;
   allowUltra: boolean;
   maxAttempts: number;
   timeoutSeconds: number;
@@ -169,6 +194,7 @@ export interface ACRPlatformApi {
   // Providers
   getProvidersStatus: () => Promise<ProviderStatus[]>;
   detectProviders: () => Promise<ProviderStatus[]>;
+  getProviderQuotas: () => Promise<ProviderQuota[]>;
 
   // Tasks
   createTask: (projectId: string, prompt: string, manualModel?: string) => Promise<Task>;

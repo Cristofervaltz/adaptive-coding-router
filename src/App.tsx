@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Project, Task, RunEvent, ProviderStatus, SubscriptionSettings } from './types';
+import { Project, Task, RunEvent, ProviderStatus, SubscriptionSettings, ProviderQuota } from './types';
 import { Navbar } from './components/Navbar';
+import { QuotaBar } from './components/QuotaBar';
 import { Dashboard } from './pages/Dashboard';
 import { TaskDetails } from './pages/TaskDetails';
 import { Statistics } from './pages/Statistics';
@@ -11,6 +12,12 @@ const defaultSettings: SubscriptionSettings = {
   reserveOpenAI: true,
   openAIBudget: 100,
   openAIUsed: 0,
+  openAIPlan: 'tier_500',
+  claudePlan: 'claude_team_5_5',
+  antigravityCreditsBudget: 100,
+  antigravityCreditsUsed: 0,
+  claudeGeneralUsed: 0,
+  claudeFableUsed: 0,
   allowUltra: true,
   maxAttempts: 3,
   timeoutSeconds: 300,
@@ -29,6 +36,7 @@ export const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [events, setEvents] = useState<RunEvent[]>([]);
   const [providers, setProviders] = useState<ProviderStatus[]>([]);
+  const [quotas, setQuotas] = useState<ProviderQuota[]>([]);
   const [settings, setSettings] = useState<SubscriptionSettings>(defaultSettings);
   const [loading, setLoading] = useState(true);
 
@@ -51,14 +59,16 @@ export const App: React.FC = () => {
 
     try {
       setLoading(true);
-      const [fetchedSettings, fetchedProviders, recentProjects] = await Promise.all([
+      const [fetchedSettings, fetchedProviders, fetchedQuotas, recentProjects] = await Promise.all([
         window.acrApi.getSettings().catch(() => defaultSettings),
         window.acrApi.detectProviders().catch(() => []),
+        window.acrApi.getProviderQuotas().catch(() => []),
         window.acrApi.getRecentProjects().catch(() => []),
       ]);
 
       if (fetchedSettings) setSettings(fetchedSettings);
       if (fetchedProviders) setProviders(fetchedProviders);
+      if (fetchedQuotas) setQuotas(fetchedQuotas);
 
       if (recentProjects && recentProjects.length > 0) {
         const activeProj = recentProjects[0];
@@ -91,6 +101,8 @@ export const App: React.FC = () => {
       setTasks((prev) =>
         prev.map((t) => (t.id === data.taskId ? { ...t, status: data.status } : t))
       );
+      // Refresh live quota balances when a task completes or updates
+      window.acrApi.getProviderQuotas().then(setQuotas).catch(() => {});
     });
 
     return () => {
@@ -114,8 +126,12 @@ export const App: React.FC = () => {
 
   const handleRefreshProviders = async () => {
     try {
-      const status = await window.acrApi.detectProviders();
+      const [status, quotaList] = await Promise.all([
+        window.acrApi.detectProviders(),
+        window.acrApi.getProviderQuotas(),
+      ]);
       setProviders(status);
+      setQuotas(quotaList);
     } catch (err) {
       console.error('Failed to refresh providers:', err);
     }
@@ -132,8 +148,12 @@ export const App: React.FC = () => {
   };
 
   const refreshSettings = async () => {
-    const s = await window.acrApi.getSettings();
+    const [s, quotaList] = await Promise.all([
+      window.acrApi.getSettings(),
+      window.acrApi.getProviderQuotas(),
+    ]);
     setSettings(s);
+    setQuotas(quotaList);
   };
 
   if (loading) {
@@ -158,6 +178,8 @@ export const App: React.FC = () => {
         providers={providers}
         onRefreshProviders={handleRefreshProviders}
       />
+
+      <QuotaBar quotas={quotas} onRefresh={handleRefreshProviders} />
 
       <main className="flex-1 flex overflow-hidden">
         {selectedTaskId ? (

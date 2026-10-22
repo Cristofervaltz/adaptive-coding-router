@@ -8,6 +8,7 @@ const api: ACRPlatformApi = {
 
   getProvidersStatus: () => ipcRenderer.invoke('providers:getStatus'),
   detectProviders: () => ipcRenderer.invoke('providers:detect'),
+  getProviderQuotas: () => ipcRenderer.invoke('providers:getQuotas'),
 
   createTask: (projectId: string, prompt: string, manualModel?: string) =>
     ipcRenderer.invoke('tasks:create', projectId, prompt, manualModel),
