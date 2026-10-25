@@ -128,6 +128,8 @@ export interface ProviderQuota {
   providerId: 'codex' | 'antigravity' | 'claude' | 'opencode';
   providerName: string;
   tierPlan: string;
+  accountEmail?: string;
+  accountDetail?: string;
   isOnline: boolean;
   pools: QuotaPool[];
 }
@@ -136,12 +138,13 @@ export interface SubscriptionSettings {
   reserveOpenAI: boolean;
   openAIBudget: number;
   openAIUsed: number;
-  openAIPlan: 'tier_500' | 'pro_200' | 'plus_20';
-  claudePlan: 'claude_team_5_5' | 'claude_pro' | 'api';
-  antigravityCreditsBudget: number;
-  antigravityCreditsUsed: number;
+  codex5hUsed: number;
+  antigravityGeminiUsed: number;
+  antigravityClaudeUsed: number;
+  antigravityGptUsed: number;
   claudeGeneralUsed: number;
   claudeFableUsed: number;
+  opencodeCloudUsed: number;
   allowUltra: boolean;
   maxAttempts: number;
   timeoutSeconds: number;
@@ -151,6 +154,11 @@ export interface SubscriptionSettings {
   opencodePath: string;
   routingMode: 'auto' | 'manual';
   manualModel: string;
+  detectedCodexPlan?: string;
+  detectedCodexEmail?: string;
+  detectedClaudeTier?: string;
+  detectedAntigravityTier?: string;
+  detectedOpenCodeTier?: string;
 }
 
 export interface StatisticsOverview {

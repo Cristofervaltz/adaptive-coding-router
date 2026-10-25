@@ -140,7 +140,7 @@ export class TaskScheduler {
         this.updateStatus(task.id, 'running', runId);
 
         // Record usage for subscription tracking
-        this.subscriptionManager.recordUsage(route.model);
+        this.subscriptionManager.recordUsage(route.model, 1, route.provider);
 
         // Execute via ExecutionManager
         const { exitCode, errorMessage } = await this.executionManager.executeRun(

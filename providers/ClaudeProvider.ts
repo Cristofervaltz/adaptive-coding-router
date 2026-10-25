@@ -84,6 +84,7 @@ export class ClaudeProvider implements AgentProvider {
           'claude-5-5-sonnet',
           'claude-5-5-opus-thinking',
           'claude-5-5-haiku',
+          'claude-5-5-fable',
           'claude-sonnet-4-6',
         ],
         supportsReasoning: true,
@@ -147,6 +148,7 @@ export class ClaudeProvider implements AgentProvider {
         'claude-5-5-sonnet',
         'claude-5-5-opus-thinking',
         'claude-5-5-haiku',
+        'claude-5-5-fable',
         'claude-sonnet-4-6',
       ];
     }

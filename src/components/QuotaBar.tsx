@@ -10,6 +10,7 @@ import {
   CheckCircle,
   Clock,
   RefreshCw,
+  User,
 } from 'lucide-react';
 
 interface QuotaBarProps {
@@ -76,20 +77,33 @@ export const QuotaBar: React.FC<QuotaBarProps> = ({ quotas, onRefresh }) => {
                 {pq.providerId === 'codex' && primaryPool?.isUnlimited ? (
                   <span className="flex items-center gap-1 text-emerald-400 font-medium">
                     <InfinityIcon className="w-3 h-3" />
-                    <span>No 5h Limit</span>
+                    <span>$500 Pro (No 5h Limit)</span>
+                  </span>
+                ) : pq.providerId === 'codex' ? (
+                  <span className="text-zinc-300">
+                    5h: {Math.max(0, (primaryPool?.total || 40) - (primaryPool?.used || 0))} reqs left
+                  </span>
+                ) : pq.providerId === 'antigravity' ? (
+                  <span className="flex items-center gap-1 text-zinc-300">
+                    <span className="text-blue-400" title="Gemini Models Quota">
+                      Gemini: {100 - (pq.pools[0]?.used || 0)}%
+                    </span>
+                    <span className="text-zinc-600">|</span>
+                    <span className="text-purple-400" title="Claude in Antigravity Quota">
+                      Claude: {100 - (pq.pools[1]?.used || 0)}%
+                    </span>
+                    <span className="text-zinc-600">|</span>
+                    <span className="text-emerald-400" title="GPT-OSS in Antigravity Quota">
+                      GPT: {100 - (pq.pools[2]?.used || 0)}%
+                    </span>
                   </span>
                 ) : pq.providerId === 'claude' ? (
                   <span className="flex items-center gap-1 text-cyan-400">
-                    <span>5.5 Core: {100 - primaryPool?.used}%</span>
+                    <span>5.5 Core: {100 - (primaryPool?.used || 0)}%</span>
                     <span className="text-zinc-600">|</span>
                     <span className="text-amber-300" title="Separate quota pool for Fable 5.5">
-                      Fable: {pq.pools[1]?.total - pq.pools[1]?.used}
+                      Fable: {Math.max(0, (pq.pools[1]?.total || 50) - (pq.pools[1]?.used || 0))} left
                     </span>
-                  </span>
-                ) : pq.providerId === 'antigravity' ? (
-                  <span className="flex items-center gap-1 text-blue-400">
-                    <Zap className="w-3 h-3 text-blue-400" />
-                    <span>Credits: {primaryPool?.total - primaryPool?.used}</span>
                   </span>
                 ) : (
                   <span className="flex items-center gap-1 text-emerald-400">
@@ -124,16 +138,22 @@ export const QuotaBar: React.FC<QuotaBarProps> = ({ quotas, onRefresh }) => {
                   : 'bg-zinc-950/40 border-zinc-900 opacity-60'
               }`}
             >
-              {/* Provider Header & Plan Tag */}
-              <div className="flex items-center justify-between pb-1.5 border-b border-zinc-800/80 mb-2">
-                <div className="flex items-center gap-1.5">
+              {/* Provider Header, Plan Tag & Account */}
+              <div className="pb-1.5 border-b border-zinc-800/80 mb-2">
+                <div className="flex items-center justify-between">
                   <span className="font-semibold text-zinc-200 text-xs">
                     {pq.providerName}
                   </span>
+                  <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400 border border-zinc-700/60">
+                    {pq.tierPlan}
+                  </span>
                 </div>
-                <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400 border border-zinc-700/60">
-                  {pq.tierPlan}
-                </span>
+                {(pq.accountEmail || pq.accountDetail) && (
+                  <div className="flex items-center gap-1 text-[10px] text-zinc-400 font-mono mt-1">
+                    <User className="w-2.5 h-2.5 text-zinc-500" />
+                    <span className="truncate">{pq.accountEmail || pq.accountDetail}</span>
+                  </div>
+                )}
               </div>
 
               {/* Individual Quota Pools */}
@@ -144,12 +164,25 @@ export const QuotaBar: React.FC<QuotaBarProps> = ({ quotas, onRefresh }) => {
                     : Math.min(100, Math.round((pool.used / (pool.total || 1)) * 100));
 
                   const isFable = pool.id.includes('fable');
+                  const isClaudeInAgy = pool.id.includes('antigravity_claude');
+                  const isGptInAgy = pool.id.includes('antigravity_gpt');
 
                   return (
                     <div key={pool.id} className="text-[11px]">
                       <div className="flex items-center justify-between text-zinc-400 mb-0.5">
-                        <span className={`truncate flex items-center gap-1 ${isFable ? 'text-amber-300 font-medium' : ''}`}>
+                        <span
+                          className={`truncate flex items-center gap-1 ${
+                            isFable
+                              ? 'text-amber-300 font-medium'
+                              : isClaudeInAgy
+                              ? 'text-purple-300'
+                              : isGptInAgy
+                              ? 'text-emerald-300'
+                              : ''
+                          }`}
+                        >
                           {isFable && <Sparkles className="w-3 h-3 text-amber-400" />}
+                          {isClaudeInAgy && <Zap className="w-3 h-3 text-purple-400" />}
                           {pool.name}
                         </span>
 
@@ -174,6 +207,10 @@ export const QuotaBar: React.FC<QuotaBarProps> = ({ quotas, onRefresh }) => {
                                 ? 'bg-rose-500'
                                 : isFable
                                 ? 'bg-amber-400'
+                                : isClaudeInAgy
+                                ? 'bg-purple-400'
+                                : isGptInAgy
+                                ? 'bg-emerald-400'
                                 : percent > 60
                                 ? 'bg-amber-500'
                                 : 'bg-blue-500'

@@ -154,56 +154,80 @@ export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved, providers =
               />
             </label>
 
-            {/* Plan selection */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-zinc-800/60">
-              <div>
-                <label className="block font-medium text-zinc-300 mb-1">
-                  OpenAI Subscription Tier
-                </label>
-                <select
-                  value={settings.openAIPlan || 'tier_500'}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      openAIPlan: e.target.value as 'tier_500' | 'pro_200' | 'plus_20',
-                    })
-                  }
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
-                >
-                  <option value="tier_500">$500 Max Tier (No 5-hour rolling limit)</option>
-                  <option value="pro_200">$200 Pro Tier (Higher rate limits)</option>
-                  <option value="plus_20">$20 Plus Tier (Rolling 5-hour message cap)</option>
-                </select>
-                <span className="text-[11px] text-zinc-500 mt-0.5 block">
-                  Select your subscription tier to tune rate limiting and quota penalties.
-                </span>
-              </div>
+            {/* Native Subscription & Quota Pool Detection Display */}
+            <div className="pt-2 border-t border-zinc-800/60 space-y-3">
+              <span className="block font-medium text-zinc-300 text-xs">
+                Natively Detected Subscriptions & Quota Allocations
+              </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Codex */}
+                <div className="bg-zinc-950 p-2.5 rounded border border-zinc-800/80">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-semibold text-zinc-200">OpenAI Codex</span>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-blue-950/60 text-blue-400 border border-blue-800/50">
+                      {settings.detectedCodexPlan || 'Plus Tier'}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-zinc-400 space-y-0.5">
+                    {settings.detectedCodexEmail && (
+                      <p className="text-zinc-500 font-mono text-[10px]">Account: {settings.detectedCodexEmail}</p>
+                    )}
+                    <p className="text-zinc-400">
+                      {settings.detectedCodexPlan?.includes('Unlimited')
+                        ? 'Continuous execution without 5-hour rolling limits ($500 Plan)'
+                        : 'Enforces standard 5-hour rolling window (40 reqs)'}
+                    </p>
+                  </div>
+                </div>
 
-              <div>
-                <label className="block font-medium text-zinc-300 mb-1">
-                  Claude Subscription Plan
-                </label>
-                <select
-                  value={settings.claudePlan || 'claude_team_5_5'}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      claudePlan: e.target.value as 'claude_team_5_5' | 'claude_pro' | 'api',
-                    })
-                  }
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700"
-                >
-                  <option value="claude_team_5_5">Team 5.5 (Dedicated Fable 5.5 Quota Pool)</option>
-                  <option value="claude_pro">Claude Pro (Standard Quota)</option>
-                  <option value="api">Anthropic Direct API Key</option>
-                </select>
-                <span className="text-[11px] text-zinc-500 mt-0.5 block">
-                  Manages separate quota pools for Fable 5.5 and Core 5.5 models.
-                </span>
+                {/* Antigravity Tri-Pool */}
+                <div className="bg-zinc-950 p-2.5 rounded border border-zinc-800/80">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-semibold text-zinc-200">Google Antigravity</span>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-950/60 text-emerald-400 border border-emerald-800/50">
+                      Tri-Pool Quota Mode
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-zinc-400 space-y-0.5">
+                    <p className="text-zinc-400">
+                      Separate quotas: Gemini models (1000 RPM), Claude in agy, and GPT-OSS (120B)
+                    </p>
+                  </div>
+                </div>
+
+                {/* Claude Code */}
+                <div className="bg-zinc-950 p-2.5 rounded border border-zinc-800/80">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-semibold text-zinc-200">Anthropic Claude Code</span>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-950/60 text-purple-400 border border-purple-800/50">
+                      {settings.detectedClaudeTier || '5.5 Multi-Pool'}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-zinc-400 space-y-0.5">
+                    <p className="text-zinc-400">
+                      Separate dedicated quota pool for Fable 5.5 distinct from Core 5.5 and Haiku
+                    </p>
+                  </div>
+                </div>
+
+                {/* OpenCode */}
+                <div className="bg-zinc-950 p-2.5 rounded border border-zinc-800/80">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-semibold text-zinc-200">OpenCode CLI</span>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-950/60 text-amber-400 border border-amber-800/50">
+                      {settings.detectedOpenCodeTier || 'Local + Cloud'}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-zinc-400 space-y-0.5">
+                    <p className="text-zinc-400">
+                      Local Ollama / vLLM execution (zero quota cost) + Free Cloud API tier
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Quota limit and counter */}
+            {/* Quota limit and counters */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-zinc-800/60">
               <div>
                 <span className="block font-medium text-zinc-300 mb-1">
@@ -226,7 +250,7 @@ export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved, providers =
                   <span className="font-medium text-zinc-300">OpenAI Budget Used</span>
                   <button
                     type="button"
-                    onClick={() => setSettings({ ...settings, openAIUsed: 0 })}
+                    onClick={() => setSettings({ ...settings, openAIUsed: 0, codex5hUsed: 0 })}
                     className="text-[10px] text-blue-400 hover:text-blue-300"
                   >
                     Reset
@@ -245,7 +269,7 @@ export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved, providers =
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-zinc-300">Fable 5.5 Used</span>
+                  <span className="font-medium text-zinc-300">Fable 5.5 Pool Used</span>
                   <button
                     type="button"
                     onClick={() => setSettings({ ...settings, claudeFableUsed: 0 })}
