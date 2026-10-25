@@ -234,13 +234,23 @@ export class SubscriptionManager {
     const codexPools: QuotaPool[] = [
       {
         id: 'codex_5h',
-        name: isCodexUnlimited ? '5-Hour Rate Limit ($500 Plan)' : '5-Hour Rolling Window',
+        name: isCodexUnlimited ? 'Standard Models ($500 Plan)' : 'Standard Models (5h Rolling Window)',
         total: isCodexUnlimited ? 100 : 40,
         used: isCodexUnlimited ? 0 : Math.min(40, s.codex5hUsed || 0),
         unit: isCodexUnlimited ? 'unlimited' : 'requests',
         isUnlimited: isCodexUnlimited,
         resetPeriod: isCodexUnlimited ? 'No rolling window' : '5 hours',
-        statusText: isCodexUnlimited ? 'No 5-hour limit ($500 Pro)' : `${Math.max(0, 40 - (s.codex5hUsed || 0))} reqs left in 5h window`,
+        statusText: isCodexUnlimited ? 'No 5h limit ($500 Pro)' : `${Math.max(0, 40 - (s.codex5hUsed || 0))} reqs left in 5h window`,
+      },
+      {
+        id: 'codex_reasoning',
+        name: 'Deep Reasoning (Sol High / Ultra)',
+        total: isCodexUnlimited ? 100 : 50,
+        used: isCodexUnlimited ? 0 : Math.min(50, Math.round((s.openAIUsed || 0) * 1.5)),
+        unit: isCodexUnlimited ? 'unlimited' : 'requests',
+        isUnlimited: isCodexUnlimited,
+        resetPeriod: isCodexUnlimited ? 'Continuous compute' : 'Weekly separate pool',
+        statusText: isCodexUnlimited ? 'Unlimited reasoning ($500 Pro)' : `${Math.max(0, 50 - Math.round((s.openAIUsed || 0) * 1.5))} weekly reqs left`,
       },
       {
         id: 'codex_compute',
@@ -253,11 +263,12 @@ export class SubscriptionManager {
       },
     ];
 
-    // 2. Google Antigravity (strictly separated pools for Gemini, Claude, and GPT-OSS)
+    // 2. Google Antigravity (Gemini Native pool + Shared Claude & GPT-OSS pool)
+    const externalUsed = (s.antigravityClaudeUsed || 0) + (s.antigravityGptUsed || 0);
     const antigravityPools: QuotaPool[] = [
       {
         id: 'antigravity_gemini',
-        name: 'Gemini Models (Flash High/Med/Low)',
+        name: 'Google Gemini Models (Flash High/Med/Low)',
         total: 100,
         used: Math.min(100, (s.antigravityGeminiUsed || 0) * 2),
         unit: 'percentage',
@@ -265,22 +276,13 @@ export class SubscriptionManager {
         statusText: `${Math.max(0, 100 - (s.antigravityGeminiUsed || 0) * 2)}% remaining (Gemini Quota)`,
       },
       {
-        id: 'antigravity_claude',
-        name: 'Claude in Antigravity (Sonnet & Opus)',
+        id: 'antigravity_external_shared',
+        name: 'External Models (Claude & GPT Shared)',
         total: 100,
-        used: Math.min(100, (s.antigravityClaudeUsed || 0) * 4),
+        used: Math.min(100, externalUsed * 3),
         unit: 'percentage',
-        resetPeriod: 'Daily isolated pool',
-        statusText: `${Math.max(0, 100 - (s.antigravityClaudeUsed || 0) * 4)}% remaining (Anthropic in agy)`,
-      },
-      {
-        id: 'antigravity_gpt_oss',
-        name: 'GPT-OSS in Antigravity (120B)',
-        total: 100,
-        used: Math.min(100, (s.antigravityGptUsed || 0) * 2),
-        unit: 'percentage',
-        resetPeriod: 'Dedicated compute cluster',
-        statusText: `${Math.max(0, 100 - (s.antigravityGptUsed || 0) * 2)}% remaining (GPT-OSS Quota)`,
+        resetPeriod: 'Shared partner pool',
+        statusText: `${Math.max(0, 100 - externalUsed * 3)}% remaining (Claude + GPT Shared)`,
       },
     ];
 

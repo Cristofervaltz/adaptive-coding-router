@@ -180,17 +180,17 @@ export const Settings: React.FC<SettingsProps> = ({ onSettingsSaved, providers =
                   </div>
                 </div>
 
-                {/* Antigravity Tri-Pool */}
+                {/* Antigravity Dual-Pool */}
                 <div className="bg-zinc-950 p-2.5 rounded border border-zinc-800/80">
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-semibold text-zinc-200">Google Antigravity</span>
                     <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-950/60 text-emerald-400 border border-emerald-800/50">
-                      Tri-Pool Quota Mode
+                      Dual-Pool Quota Mode
                     </span>
                   </div>
                   <div className="text-[11px] text-zinc-400 space-y-0.5">
                     <p className="text-zinc-400">
-                      Separate quotas: Gemini models (1000 RPM), Claude in agy, and GPT-OSS (120B)
+                      Separate quotas: native Gemini models (1000 RPM) and shared partner quota for Claude + GPT.
                     </p>
                   </div>
                 </div>

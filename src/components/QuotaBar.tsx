@@ -77,24 +77,24 @@ export const QuotaBar: React.FC<QuotaBarProps> = ({ quotas, onRefresh }) => {
                 {pq.providerId === 'codex' && primaryPool?.isUnlimited ? (
                   <span className="flex items-center gap-1 text-emerald-400 font-medium">
                     <InfinityIcon className="w-3 h-3" />
-                    <span>$500 Pro (No 5h Limit)</span>
+                    <span>$500 Pro (Unlimited)</span>
                   </span>
                 ) : pq.providerId === 'codex' ? (
-                  <span className="text-zinc-300">
-                    5h: {Math.max(0, (primaryPool?.total || 40) - (primaryPool?.used || 0))} reqs left
+                  <span className="flex items-center gap-1 text-zinc-300">
+                    <span>5h: {Math.max(0, (primaryPool?.total || 40) - (primaryPool?.used || 0))} left</span>
+                    <span className="text-zinc-600">|</span>
+                    <span className="text-indigo-400" title="Deep Reasoning weekly pool">
+                      Reasoning: {Math.max(0, (pq.pools[1]?.total || 50) - (pq.pools[1]?.used || 0))} left
+                    </span>
                   </span>
                 ) : pq.providerId === 'antigravity' ? (
                   <span className="flex items-center gap-1 text-zinc-300">
-                    <span className="text-blue-400" title="Gemini Models Quota">
+                    <span className="text-blue-400" title="Google Gemini Models Quota">
                       Gemini: {100 - (pq.pools[0]?.used || 0)}%
                     </span>
                     <span className="text-zinc-600">|</span>
-                    <span className="text-purple-400" title="Claude in Antigravity Quota">
-                      Claude: {100 - (pq.pools[1]?.used || 0)}%
-                    </span>
-                    <span className="text-zinc-600">|</span>
-                    <span className="text-emerald-400" title="GPT-OSS in Antigravity Quota">
-                      GPT: {100 - (pq.pools[2]?.used || 0)}%
+                    <span className="text-purple-400" title="Shared Claude & GPT Quota Pool in Antigravity">
+                      Claude & GPT: {100 - (pq.pools[1]?.used || 0)}%
                     </span>
                   </span>
                 ) : pq.providerId === 'claude' ? (
